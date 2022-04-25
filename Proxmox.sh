@@ -264,7 +264,7 @@ function ConfigurePackages() {
     function ConfigureGPG() {
         GPG_PUBKEY=""
         if [ "${GPG_PUBKEY}" == "" ]; then
-            GPG_PUBKEY="EB1D3F024418A7248C3B781F74650D6D 009A61C4"
+            GPG_PUBKEY="EB1D3F024418A7248C3B781F74650D6D009A61C4"
         fi
         which "gpg" > "/dev/null" 2>&1
         if [ "$?" -eq "0" ]; then
