@@ -4,7 +4,7 @@
 
 ## How to get and use?
 # curl "https://github.com/fcxlearning/AutoDeployments/raw/main/ProxmoxVE.sh" | sudo bash
-# wget -qO- "https://github.com/fcxlearning/AutoDeployments/raw/main/Proxmox.sh" | sudo bash
+# wget -qO- "https://github.com/fcxlearning/AutoDeployments/main/Proxmox.sh" | sudo bash
 
 ## Function
 # Get System Information
