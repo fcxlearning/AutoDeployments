@@ -1,15 +1,18 @@
 #!/bin/bash
 
-# Current Version: 1.9.6
+# Current Version: 2.0.0
 
 ## How to get and use?
-# curl "https://github.com/fcxlearning/AutoDeployments/raw/main/Proxmox.sh" | sudo bash
-# wget -qO- "https://github.com/fcxlearning/AutoDeployments/raw/main/Proxmox.sh" | sudo bash
+# curl "https://source.zhijie.online/AutoDeploy/main/ProxmoxVE.sh" | sudo bash
+# wget -qO- "https://source.zhijie.online/AutoDeploy/main/ProxmoxVE.sh" | sudo bash
 
 ## Function
 # Get System Information
 function GetSystemInformation() {
     function CheckHypervisorEnvironment() {
+        if [ -f "/etc/apt/sources.list.d/pve-enterprise.list" ]; then
+            rm -rf "/etc/apt/sources.list.d/pve-enterprise.list"
+        fi
         which "virt-what" > "/dev/null" 2>&1
         if [ "$?" -eq "1" ]; then
             apt update && apt install virt-what -qy
@@ -51,7 +54,7 @@ function GetSystemInformation() {
         OLD_HOSTNAME=$(cat "/etc/hostname")
     }
     function GetLSBCodename() {
-        LSBCodename=$(cat "/etc/os-release" | grep "CODENAME" | cut -f 2 -d "=")
+        LSBCodename="bullseye"
     }
     function GetManagementIPAddress() {
         CURRENT_MANAGEMENT_IP=$(ip address show vmbr0 | grep "inet" | awk '{print $2}' | sort | head -n 1 | sed "s/\/.*//")
@@ -71,21 +74,21 @@ function GetSystemInformation() {
 # Set Repository Mirror
 function SetRepositoryMirror() {
     mirror_list=(
-        "deb ${transport_protocol}://security.debian.org/debian-security ${LSBCodename}-security main contrib non-free"
-        "deb ${transport_protocol}://ftp.debian.org/debian ${LSBCodename} main contrib non-free"
-        "deb ${transport_protocol}://ftp.debian.org/debian ${LSBCodename}-backports main contrib non-free"
-        "deb ${transport_protocol}://ftp.debian.org/debian ${LSBCodename}-updates main contrib non-free"
-        "deb-src ${transport_protocol}://security.debian.org/debian-security ${LSBCodename}-security main contrib non-free"
-        "deb-src ${transport_protocol}://ftp.debian.org/debian ${LSBCodename} main contrib non-free"
-        "deb-src ${transport_protocol}://ftp.debian.org/debian ${LSBCodename}-backports main contrib non-free"
-        "deb-src ${transport_protocol}://ftp.debian.org/debian ${LSBCodename}-updates main contrib non-free"
+        "deb ${transport_protocol}://mirrors.ustc.edu.cn/debian-security ${LSBCodename}-security main contrib non-free"
+        "deb ${transport_protocol}://mirrors.ustc.edu.cn/debian ${LSBCodename} main contrib non-free"
+        "deb ${transport_protocol}://mirrors.ustc.edu.cn/debian ${LSBCodename}-backports main contrib non-free"
+        "deb ${transport_protocol}://mirrors.ustc.edu.cn/debian ${LSBCodename}-updates main contrib non-free"
+        "deb-src ${transport_protocol}://mirrors.ustc.edu.cn/debian-security ${LSBCodename}-security main contrib non-free"
+        "deb-src ${transport_protocol}://mirrors.ustc.edu.cn/debian ${LSBCodename} main contrib non-free"
+        "deb-src ${transport_protocol}://mirrors.ustc.edu.cn/debian ${LSBCodename}-backports main contrib non-free"
+        "deb-src ${transport_protocol}://mirrors.ustc.edu.cn/debian ${LSBCodename}-updates main contrib non-free"
     )
     proxmox_mirror_list=(
         "# deb ${transport_protocol}://enterprise.proxmox.com/debian/pve ${LSBCodename} pve-enterprise"
-        "deb ${transport_protocol}://download.proxmox.com/debian/pve ${LSBCodename} pve-no-subscription"
-        "# deb ${transport_protocol}://download.proxmox.com/debian/ ${LSBCodename} pvetest"
-        "deb ${transport_protocol}://download.proxmox.com/debian/ceph-pacific ${LSBCodename} main"
-        "# deb ${transport_protocol}://download.proxmox.com/debian/debian/ceph-pacific ${LSBCodename} test"
+        "deb ${transport_protocol}://mirrors.ustc.edu.cn/proxmox/debian ${LSBCodename} pve-no-subscription"
+        "# deb ${transport_protocol}://mirrors.ustc.edu.cn/proxmox/debian ${LSBCodename} pvetest"
+        "deb ${transport_protocol}://mirrors.ustc.edu.cn/proxmox/debian/ceph-pacific ${LSBCodename} main"
+        "# deb ${transport_protocol}://mirrors.ustc.edu.cn/proxmox/debian/ceph-pacific ${LSBCodename} test"
     )
     if [ ! -d "/etc/apt/sources.list.d" ]; then
         mkdir "/etc/apt/sources.list.d"
@@ -264,7 +267,7 @@ function ConfigurePackages() {
     function ConfigureGPG() {
         GPG_PUBKEY=""
         if [ "${GPG_PUBKEY}" == "" ]; then
-            GPG_PUBKEY="EB1D3F024418A7248C3B781F74650D6D009A61C4"
+            GPG_PUBKEY=""
         fi
         which "gpg" > "/dev/null" 2>&1
         if [ "$?" -eq "0" ]; then
@@ -426,7 +429,7 @@ function ConfigurePackages() {
             fi
         fi
         if [ "${WHICH_PIP}" != "null" ]; then
-            ${WHICH_PIP} config set global.index-url "https://ftp.us.debian.org/pypi/web/simple"
+            ${WHICH_PIP} config set global.index-url "https://mirrors.ustc.edu.cn/pypi/web/simple"
         fi
         if [ -f "/root/.config/pip/pip.conf" ]; then
             if [ ! -d "/home/${DEFAULT_USERNAME}/.config" ]; then
@@ -733,7 +736,7 @@ function UpgradePackages() {
 }
 # Cleanup Temp Files
 function CleanupTempFiles() {
-    apt clean && rm -rf /root/.*_history /tmp/*
+    apt clean && rm -rf /etc/apt/sources.list.d/pve-enterprise.list* /root/.*_history /tmp/*
 }
 
 ## Process
@@ -761,4 +764,3 @@ ConfigurePackages
 read_only="TRUE" && SetReadonlyFlag
 # Call CleanupTempFiles
 CleanupTempFiles
-Copied
