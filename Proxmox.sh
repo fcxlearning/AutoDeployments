@@ -3,8 +3,8 @@
 # Current Version: 2.0.0
 
 ## How to get and use?
-# curl "https://source.zhijie.online/AutoDeploy/main/ProxmoxVE.sh" | sudo bash
-# wget -qO- "https://source.zhijie.online/AutoDeploy/main/ProxmoxVE.sh" | sudo bash
+# curl "https://github.com/fcxlearning/AutoDeployments/raw/main/Proxmox.sh" | sudo bash
+# wget -qO- "https://github.com/fcxlearning/AutoDeployments/raw/main/Proxmox.sh" | sudo bash
 
 ## Function
 # Get System Information
